@@ -23,6 +23,7 @@ cv2.ocl.setUseOpenCL(False)  # To prevent freeze of DataLoader
 def train(prepared_train_labels, train_images_folder, num_refinement_stages, base_lr, batch_size, batches_per_iter,
           num_workers, checkpoint_path, weights_only, from_mobilenet, checkpoints_folder, log_after,
           val_labels, val_images_folder, val_output_name, checkpoint_after, val_after):
+
     net = PoseEstimationWithMobileNet(num_refinement_stages)
 
     stride = 8
@@ -58,18 +59,19 @@ def train(prepared_train_labels, train_images_folder, num_refinement_stages, bas
     current_epoch = 0
     drop_after_epoch = [100, 200, 260]
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=drop_after_epoch, gamma=0.333)
-    if checkpoint_path:
-        checkpoint = torch.load(checkpoint_path)
+    
+    # if checkpoint_path:
+    #     checkpoint = torch.load(checkpoint_path)
 
-        if from_mobilenet:
-            load_from_mobilenet(net, checkpoint)
-        else:
-            load_state(net, checkpoint)
-            if not weights_only:
-                optimizer.load_state_dict(checkpoint['optimizer'])
-                scheduler.load_state_dict(checkpoint['scheduler'])
-                num_iter = checkpoint['iter']
-                current_epoch = checkpoint['current_epoch']
+    #     if from_mobilenet:
+    #         load_from_mobilenet(net, checkpoint)
+    #     else:
+    #         load_state(net, checkpoint)
+    #         if not weights_only:
+    #             optimizer.load_state_dict(checkpoint['optimizer'])
+    #             scheduler.load_state_dict(checkpoint['scheduler'])
+    #             num_iter = checkpoint['iter']
+    #             current_epoch = checkpoint['current_epoch']
 
     net = DataParallel(net).cuda()
     net.train()
